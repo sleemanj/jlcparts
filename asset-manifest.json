@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "https://yaqwsx.github.io/jlcparts/static/css/main.1d5ee949.chunk.css",
+    "main.js": "https://yaqwsx.github.io/jlcparts/static/js/main.c62dca6e.chunk.js",
+    "main.js.map": "https://yaqwsx.github.io/jlcparts/static/js/main.c62dca6e.chunk.js.map",
+    "runtime-main.js": "https://yaqwsx.github.io/jlcparts/static/js/runtime-main.ca322365.js",
+    "runtime-main.js.map": "https://yaqwsx.github.io/jlcparts/static/js/runtime-main.ca322365.js.map",
+    "static/js/2.63e34fe3.chunk.js": "https://yaqwsx.github.io/jlcparts/static/js/2.63e34fe3.chunk.js",
+    "static/js/2.63e34fe3.chunk.js.map": "https://yaqwsx.github.io/jlcparts/static/js/2.63e34fe3.chunk.js.map",
+    "index.html": "https://yaqwsx.github.io/jlcparts/index.html",
+    "precache-manifest.6e9cb9e3fd76c250c976f554ae2731de.js": "https://yaqwsx.github.io/jlcparts/precache-manifest.6e9cb9e3fd76c250c976f554ae2731de.js",
+    "service-worker.js": "https://yaqwsx.github.io/jlcparts/service-worker.js",
+    "static/css/main.1d5ee949.chunk.css.map": "https://yaqwsx.github.io/jlcparts/static/css/main.1d5ee949.chunk.css.map",
+    "static/js/2.63e34fe3.chunk.js.LICENSE.txt": "https://yaqwsx.github.io/jlcparts/static/js/2.63e34fe3.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.ca322365.js",
+    "static/js/2.63e34fe3.chunk.js",
+    "static/css/main.1d5ee949.chunk.css",
+    "static/js/main.c62dca6e.chunk.js"
+  ]
+}
