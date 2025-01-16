@@ -43,7 +43,7 @@ async function yieldExec() {
     });
 }
 
-let didSplit = false;
+// filterIds only works for "tables" that use an array for the compressedData content, i.e. {name: 'components', compressedData: {id: number, compressedData: ArrayBuffer}[]}
 export async function unpackAndProcessLines(name, callback, checkAbort, filterIds) {
     await getJsonlines();
 
@@ -52,11 +52,6 @@ export async function unpackAndProcessLines(name, callback, checkAbort, filterId
     }
 
     let time = new Date().getTime();
-
-    if (!didSplit && name === 'components') {
-        didSplit = true;
-        await ensureSplitComponentsBySubcategory();
-    }
 
     if (!window.DecompressionStream) {
         console.error("DecompressionStream is not supported in this environment.");
@@ -154,40 +149,6 @@ export async function unpackAndProcessLines(name, callback, checkAbort, filterId
     console.log(`Time to gunzip & segment ${name}: ${new Date().getTime() - time}`);
 }
 
-async function ensureSplitComponentsBySubcategory() {
-    if (Array.isArray(jsonlines['components'])) {   // already converted
-        return;
-    }
-
-    let components  = [];
-    let schema;
-
-    await unpackAndProcessLines('components', (compStr, idx) => {
-        let comp = JSON.parse(compStr);
-
-        if (idx === 0) {    // first line is always schema lookup
-            schema = comp;
-        } else {
-            const id = +comp[schema.subcategoryIdx];
-            if (!components[id]) {
-                components[id] = new pako.Deflate({level: 9, gzip: true});
-                components[id].push(JSON.stringify(schema) + '\n', false);    // first line is always schema
-            }
-
-            components[id].push(compStr + '\n');
-        }
-    });
-
-    for (const id in components) {
-        components[id].push('', true);     // close streams
-        components[id] = {id: +id, compressedData: components[id].result};   // replace with compressed bytestream
-    }
-
-    jsonlines['components'] = components;
-    let result = await db.jsonlines.put({ name: 'components', compressedData: components });
-    console.log(result);
-}
-
 // Updates the whole component library, takes a callback for reporting progress:
 // the progress is given as list of tuples (task, [statusMessage, finished])
 export async function updateComponentLibrary(report) {
@@ -210,15 +171,26 @@ export async function updateComponentLibrary(report) {
         const untarTitle = `Updating database`;
         updateProgress(untarTitle, ["In progress", false]);
 
+        const componentsCollection = [];    // components is now split into subcategories for query speed optimization
         const files = await untar(data);
         for (const file of files) {
             const basename = file.name.split('.')[0];
-            let result = await db.jsonlines.put({ name: basename, compressedData: file.buffer });
-            console.log(result);
+            if (basename.indexOf('components') === 0) {
+                const id = +basename.split('-')[1];
+                componentsCollection.push({id, compressedData: file.buffer});
+            } else {
+                let result = await db.jsonlines.put({ name: basename, compressedData: file.buffer });
+                console.log(result);
 
-            // store copy in memory (we can load from indexeddb on startup)
-            jsonlines[basename] = file.buffer;
+                // store copy in memory (we can load from indexeddb on startup)
+                jsonlines[basename] = file.buffer;
+            }
         }
+
+        // store the componentsCollection
+        let result = await db.jsonlines.put({ name: 'components', compressedData: componentsCollection });
+        console.log(result);
+        jsonlines['components'] = componentsCollection;
 
         updateProgress(untarTitle, ["OK", true]);
 

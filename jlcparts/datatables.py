@@ -404,7 +404,7 @@ def buildtables(library, outdir, ignoreoldstock, jobs):
     # db holds the data we're putting into our database file
     db = {
         "subcategories": [schemaToLookup(['subcategory', 'category', 'subcategoryIdx'])],
-        "components": [schemaToLookup(['lcsc', 'mfr', 'description', 'attrsIdx', 'stock', 'subcategoryIdx', 'joints', 'datasheet', 'price', 'img', 'url'])],
+#        "components": [schemaToLookup(['lcsc', 'mfr', 'description', 'attrsIdx', 'stock', 'subcategoryIdx', 'joints', 'datasheet', 'price', 'img', 'url'])],
         "attributes-lut": {}
     }
     
@@ -418,8 +418,11 @@ def buildtables(library, outdir, ignoreoldstock, jobs):
         subcatIndex += 1
         db["subcategories"] += [[subcatEntry["subcategory"], subcatEntry["category"], subcatIndex]]
 
+        # separate each subcategory of components into its own table
+        db[f"components-{subcatIndex}"] = [schemaToLookup(['lcsc', 'mfr', 'description', 'attrsIdx', 'stock', 'subcategoryIdx', 'joints', 'datasheet', 'price', 'img', 'url'])]
+        print(db[f"components-{subcatIndex}"])
         for comp in subcatEntry["components"]:
-            db["components"] += [[
+            db[f"components-{subcatIndex}"] += [[
                 comp[s["lcsc"]],
                 comp[s["mfr"]],
                 comp[s["description"]],
