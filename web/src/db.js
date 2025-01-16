@@ -43,7 +43,8 @@ async function yieldExec() {
     });
 }
 
-export async function unpackAndProcessLines(name, callback, checkAbort) {
+let didSplit = false;
+export async function unpackAndProcessLines(name, callback, checkAbort, filterIds) {
     await getJsonlines();
 
     if (jsonlines[name] === undefined) {
@@ -52,79 +53,139 @@ export async function unpackAndProcessLines(name, callback, checkAbort) {
 
     let time = new Date().getTime();
 
+    if (!didSplit && name === 'components') {
+        didSplit = true;
+        await ensureSplitComponentsBySubcategory();
+    }
+
     if (!window.DecompressionStream) {
         console.error("DecompressionStream is not supported in this environment.");
         return;
     }
+    
+    const compressedDataArray = [];
+    if (!Array.isArray(jsonlines[name])) {
+        compressedDataArray.push(jsonlines[name]);
+    } else {
+        filterIds = filterIds && new Set(filterIds);
+        for (const item of jsonlines[name]) {
+            if (item && (!filterIds || filterIds.has(item.id))) {
+                compressedDataArray.push(item.compressedData);
+            }
+        };
+    }
 
-    const decompressionStream = new window.DecompressionStream('gzip');
-
-    // Convert the ArrayBuffer to a ReadableStream
-    const inputStream = new ReadableStream({
-        start(controller) {
-            controller.enqueue(jsonlines[name]);
-            controller.close();
-        },
-    });
-
-    // Pipe the input stream through the decompression stream
-    const decompressedStream = inputStream.pipeThrough(decompressionStream);
-
-    // Convert the stream into text
-    const textStream = decompressedStream.pipeThrough(new window.TextDecoderStream());
-
-    const reader = textStream.getReader();  // to read chunks of text from stream
-    let chunk = '';
-    let idx = 0;
+    let abort = false;
     let lastYield = new Date().getTime();
+    for (const compressedData of compressedDataArray) {
+        const decompressionStream = new window.DecompressionStream('gzip');
 
-    try {
-        while (true) {
+        // Convert the ArrayBuffer to a ReadableStream
+        const inputStream = new ReadableStream({
+            start(controller) {
+                controller.enqueue(compressedData);
+                controller.close();
+            },
+        });
 
-            // Periodically allow UI to do what it needs to, including updating any abort flag.
-            // This does slow down the this function a variable amount (could be <100ms, could be a few seconds) 
-            const now = new Date().getTime();
-            if (now - lastYield > 300) {
-                await yieldExec();
-                console.log('yielded for ', new Date().getTime() - now, 'ms');
-                lastYield = new Date().getTime();
+        // Pipe the input stream through the decompression stream
+        const decompressedStream = inputStream.pipeThrough(decompressionStream);
 
-                if (checkAbort && checkAbort()) {   // check abort flag
+        // Convert the stream into text
+        const textStream = decompressedStream.pipeThrough(new window.TextDecoderStream());
+
+        const reader = textStream.getReader();  // to read chunks of text from stream
+        let chunk = '';
+        let idx = 0;
+
+        try {
+            while (true) {
+
+                // Periodically allow UI to do what it needs to, including updating any abort flag.
+                // This does slow down the this function a variable amount (could be <100ms, could be a few seconds) 
+                const now = new Date().getTime();
+                if (now - lastYield > 300) {
+                    await yieldExec();
+                    console.log('yielded for ', new Date().getTime() - now, 'ms');
+                    lastYield = new Date().getTime();
+
+                    if (checkAbort && checkAbort()) {   // check abort flag
+                        abort = true;
+                        break;
+                    }
+                }
+
+
+                const { done, value } = await reader.read();
+                if (done) {
+                    // If there's any remaining line, process it as well -- should never happen
+                    if (chunk) {
+                        callback(chunk, idx++);
+                    }
                     break;
                 }
-            }
 
+                chunk += value;
 
-            const { done, value } = await reader.read();
-            if (done) {
-                // If there's any remaining line, process it as well -- should never happen
-                if (chunk) {
-                    callback(chunk, idx++);
-                }
-                break;
-            }
-
-            chunk += value;
-
-            let start = 0;
-            while (true) {
-                let pos = chunk.indexOf('\n', start);
-                if (pos >= 0) {
-                    if (callback(chunk.slice(start, pos), idx++) === 'abort') {
-                        break;  // quit early
+                let start = 0;
+                while (true) {
+                    let pos = chunk.indexOf('\n', start);
+                    if (pos >= 0) {
+                        if (callback(chunk.slice(start, pos), idx++) === 'abort') {
+                            break;  // quit early
+                        }
+                        start = pos + 1;
+                    } else {
+                        chunk = chunk.slice(start); // dump everything that we've processed
+                        break;  // no more lines in our chunk
                     }
-                    start = pos + 1;
-                } else {
-                    chunk = chunk.slice(start); // dump everything that we've processed
-                    break;  // no more lines in our chunk
                 }
             }
+
+        } finally {
+            reader.releaseLock();
         }
 
-        console.log(`Time to gunzip & segment ${name}: ${new Date().getTime() - time}`);
-    } finally {
-        reader.releaseLock();
+        if (abort) {
+            break;
+        }
     }
+
+    console.log(`Time to gunzip & segment ${name}: ${new Date().getTime() - time}`);
+}
+
+async function ensureSplitComponentsBySubcategory() {
+    if (Array.isArray(jsonlines['components'])) {   // already converted
+        return;
+    }
+
+    let components  = [];
+    let schema;
+
+    await unpackAndProcessLines('components', (compStr, idx) => {
+        let comp = JSON.parse(compStr);
+
+        if (idx === 0) {    // first line is always schema lookup
+            schema = comp;
+        } else {
+            const id = +comp[schema.subcategoryIdx];
+            if (!components[id]) {
+                components[id] = new pako.Deflate({level: 9, gzip: true});
+                components[id].push(JSON.stringify(schema) + '\n', false);    // first line is always schema
+            }
+
+            components[id].push(compStr + '\n');
+        }
+    });
+
+    for (const id in components) {
+        components[id].push('', true);     // close streams
+        components[id] = {id: +id, compressedData: components[id].result};   // replace with compressed bytestream
+    }
+
+    jsonlines['components'] = components;
+    let result = await db.jsonlines.put({ name: 'components', compressedData: components });
+    console.log(result);
 }
 
 // Updates the whole component library, takes a callback for reporting progress:

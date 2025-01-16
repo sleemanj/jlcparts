@@ -769,7 +769,8 @@ class CategoryFilter extends React.Component {
         this.state.abort();
 
         let categoryFilter = (cat) => true;
-        
+        let catIdLookup;
+
         if (this.state.allCategories) {
             if (this.state.searchString.length < 3) { // prevent high ram usage
                 return [];
@@ -777,7 +778,7 @@ class CategoryFilter extends React.Component {
         }
         else {
             const catIds = this.collectActiveCategories();
-            const catIdLookup = new Set(catIds);
+            catIdLookup = new Set(catIds);
             categoryFilter = (catid) => catIdLookup.has(catid);
         }
         
@@ -838,7 +839,7 @@ class CategoryFilter extends React.Component {
                     }
                 }
             }
-        }, () => aborted);
+        }, () => aborted, catIdLookup);
 
         if (aborted) {
             return null;
