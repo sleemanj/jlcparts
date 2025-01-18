@@ -70,6 +70,7 @@ export async function unpackAndProcessLines(name, callback, checkAbort, filterId
         };
     }
 
+    let idx = 0;
     let abort = false;
     let lastYield = new Date().getTime();
     for (const compressedData of compressedDataArray) {
@@ -91,7 +92,7 @@ export async function unpackAndProcessLines(name, callback, checkAbort, filterId
 
         const reader = textStream.getReader();  // to read chunks of text from stream
         let chunk = '';
-        let idx = 0;
+        let firstLine = true;   // allow skipping of schema on first line for files after the first one
 
         try {
             while (true) {
@@ -115,7 +116,9 @@ export async function unpackAndProcessLines(name, callback, checkAbort, filterId
                 if (done) {
                     // If there's any remaining line, process it as well -- should never happen
                     if (chunk) {
-                        callback(chunk, idx++);
+                        if (idx === 0 || !firstLine) {  // skip schema line on all files except the first
+                            callback(chunk, idx++);
+                        }
                     }
                     break;
                 }
@@ -126,10 +129,14 @@ export async function unpackAndProcessLines(name, callback, checkAbort, filterId
                 while (true) {
                     let pos = chunk.indexOf('\n', start);
                     if (pos >= 0) {
-                        if (callback(chunk.slice(start, pos), idx++) === 'abort') {
-                            break;  // quit early
+                        if (idx === 0 || !firstLine) {  // skip schema line on all files except the first
+                            if (callback(chunk.slice(start, pos), idx++) === 'abort') {
+                                abort = true;
+                                break;  // quit early
+                            }
                         }
                         start = pos + 1;
+                        firstLine = false;
                     } else {
                         chunk = chunk.slice(start); // dump everything that we've processed
                         break;  // no more lines in our chunk
