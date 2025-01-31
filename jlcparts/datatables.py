@@ -420,7 +420,6 @@ def buildtables(library, outdir, ignoreoldstock, jobs):
 
         # separate each subcategory of components into its own table
         db[f"components-{subcatIndex}"] = [schemaToLookup(['lcsc', 'mfr', 'description', 'attrsIdx', 'stock', 'subcategoryIdx', 'joints', 'datasheet', 'price', 'img', 'url'])]
-        print(db[f"components-{subcatIndex}"])
         for comp in subcatEntry["components"]:
             db[f"components-{subcatIndex}"] += [[
                 comp[s["lcsc"]],
