@@ -135,6 +135,52 @@ class NewComponentFormatWarning extends React.Component {
   }
 }
 
+function UploadDatabase({ onUpload }) {
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      await onUpload(arrayBuffer);
+
+    } catch (err) {
+      alert(`Failed to read file: ${err}`);
+      console.error('Failed to read file:', err);
+    }
+
+    // Reset input so same file can be reselected
+    event.target.value = '';
+  };
+
+  return (
+    <div className="flex flex-wrap w-full align-middle bg-yellow-400 p-2">
+        <p className="inline-block w-full md:w-1/2 py-2">
+            Use old database files downloaded from here: 
+            <a
+                href="https://github.com/dougy83/jlcparts/deployments"
+                className="text-blue-700 hover:text-blue-900 underline font-semibold"
+                target="_blank"
+                rel="noopener noreferrer"
+                >
+                GitHub Deployments
+            </a>
+        </p>
+        <input
+          type="file"
+          accept=".tar"
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+          id="choose-database-file"
+        />
+        <button type="button" onClick={() => document.querySelector('#choose-database-file').click()} className="inline-block w-full md:w-1/2 bg-green-500 hover:bg-green-600 py-2 px-4 rounded">
+            Choose local database file
+        </button>
+    </div>
+  );
+}
+
+
 class UpdateBar extends React.Component {
   constructor(props) {
     super(props);
@@ -282,6 +328,7 @@ class App extends React.Component {
       <Router basename="/" >
         <Container>
           <UpdateBar onTriggerUpdate={this.triggerUpdate}/>
+          <UploadDatabase onUpload={async arrayBuf => await updateComponentLibrary(()=>{}, arrayBuf)}/>
           <Header/>
           <FirstTimeNote/>
           <NewComponentFormatWarning/>

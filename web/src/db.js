@@ -158,7 +158,8 @@ export async function unpackAndProcessLines(name, callback, checkAbort, filterId
 
 // Updates the whole component library, takes a callback for reporting progress:
 // the progress is given as list of tuples (task, [statusMessage, finished])
-export async function updateComponentLibrary(report) {
+// the dbFileContent allows setting the database contents to a supplied file
+export async function updateComponentLibrary(report, dbFileContent = undefined) {
     await persist();
 
     let progress = {};
@@ -166,20 +167,31 @@ export async function updateComponentLibrary(report) {
         progress[name] = status;
         report(progress);
     };
+    let updateTime = undefined;
 
-    // get new db files
-    const downloadingTitle = `Downloading ${dbWebPath}`;
-    updateProgress(downloadingTitle, ["In progress", false]);
-    const resp = await fetch(dbWebPath);
-    if (resp.status === 200) {
-        const data = await resp.arrayBuffer();
-        updateProgress(downloadingTitle, ["OK", true]);
+    if (!dbFileContent) {
+        // get new db files
+        const downloadingTitle = `Downloading ${dbWebPath}`;
+        updateProgress(downloadingTitle, ["In progress", false]);
+        const resp = await fetch(dbWebPath);
+        if (resp.status === 200) {
+            dbFileContent = await resp.arrayBuffer();
+            updateTime = resp.headers.get('Last-Modified');
+            updateProgress(downloadingTitle, ["OK", true]);
 
+        } else {
+            updateProgress(downloadingTitle, ["Download failed", false]);
+            return;
+        }
+    } 
+    
+    // we should have the db data by now
+    if (dbFileContent) {
         const untarTitle = `Updating database`;
         updateProgress(untarTitle, ["In progress", false]);
 
         const componentsCollection = [];    // components is now split into subcategories for query speed optimization
-        const files = await untar(data);
+        const files = await untar(dbFileContent);
         for (const file of files) {
             const basename = file.name.split('.')[0];
             if (basename.indexOf('components') === 0) {
@@ -203,11 +215,8 @@ export async function updateComponentLibrary(report) {
 
         db.settings.put({
             key: "lastUpdate",
-            value: resp.headers.get('Last-Modified') || new Date().toUTCString()
+            value: updateTime || new Date().toUTCString()
         });
-
-    } else {
-        updateProgress(downloadingTitle, ["Download failed", false]);
     }
 }
 
