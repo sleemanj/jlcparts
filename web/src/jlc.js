@@ -16,7 +16,7 @@ export class AttritionInfo extends React.Component {
     }
 
     componentDidMount() {
-        fetch("https://cors.bridged.cc/https://jlcpcb.com/shoppingCart/smtGood/selectSmtComponentList", {
+        fetch("https://cors.bridged.cc/https://jlcpcb.com/api/overseas-pcb-order/v1/shoppingCart/smtGood/selectSmtComponentList/v2", {
             method: 'POST',
             headers: {
                 "Accept": 'application/json, text/plain, */*',
@@ -44,7 +44,7 @@ export class AttritionInfo extends React.Component {
             if (lcscId === undefined) {
                 throw new Error(`No search results for ${this.props.component.lcsc}`);
             }
-            return fetch("https://cors.bridged.cc/https://jlcpcb.com/shoppingCart/smtGood/getComponentDetail?componentLcscId=" + lcscId, {
+            return fetch("https://cors.bridged.cc/https://jlcpcb.com/api/overseas-pcb-order/v1/shoppingCart/smtGood/getComponentDetail?componentLcscId=" + lcscId, {
                 headers: {
                     "x-cors-grida-api-key": CORS_KEY
                 },
