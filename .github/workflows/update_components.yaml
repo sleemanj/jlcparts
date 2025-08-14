@@ -21,7 +21,7 @@ jobs:
       - name: Build frontend
         run: |
           cd web
-          export BASEURL=https://dougy83.github.io/jlcparts
+          export BASEURL=https://sleemanj.github.io/jlcparts
           npm install --silent
           NODE_ENV=production PUBLIC_URL=${BASEURL} npm run build
           touch .nojekyll
