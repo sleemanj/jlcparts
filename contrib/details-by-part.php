@@ -226,6 +226,6 @@
     return;
   }
   
-  echo json_encode([ 'code' => 200, 'errpr' => null, 'data' => array_merge($component,$pricing) ], JSON_PRETTY_PRINT);
+  echo json_encode([ 'code' => 200, 'error' => null, 'data' => array_merge($component,$pricing) ], JSON_PRETTY_PRINT);
 ?>
 
