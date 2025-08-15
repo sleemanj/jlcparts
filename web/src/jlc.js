@@ -49,48 +49,86 @@ export class AttritionInfo extends React.Component {
                 <tbody>
                 { data.lossNumber
                     ? <tr>
-                        <td className="w-1 whitespace-no-wrap">Attrition:</td>
-                        <td className="px-2">{data.lossNumber} pcs</td>
+                        <td className="md:w-2/5">Attrition:</td>
+                        <td>{data.lossNumber} pcs</td>
                       </tr>
                     : ""
                 }
                 { data.leastNumber
                     ? <tr>
-                        <td className="w-1 whitespace-no-wrap">Minimal order quantity:</td>
-                        <td className="px-2">{data.leastNumber} pcs</td>
+                        <td className="md:w-2/5">Minimal order quantity:</td>
+                        <td>{data.leastNumber} pcs</td>
                       </tr>
                     : ""
                 }
-                <tr>
-                    <td className="w-1 whitespace-no-wrap">Price for {this.props.quantity} pcs:</td>
-                    <td className="px-2">{Math.round((this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
-                </tr>
-
                 { (data.componentLibraryType === 'expand' && !data.preferredComponentFlag)
                     ? <React.Fragment>
                           <tr>
-                            <td className="w-1 whitespace-no-wrap">Loading Fee</td>
-                            <td className="px-2">$3 USD (Extended Part)</td>    
+                            <th className="md:w-5/5" colSpan="2">Economic PCBA</th>
+                          </tr>   
+                          <tr>
+                            <td className="md:w-2/5">Loading Fee:</td>
+                            <td>$3 USD (Extended Part)</td>    
                           </tr>
                           <tr>
-                            <td className="w-1 whitespace-no-wrap">Amortised Cost {this.props.quantity} pcs:</td>
-                            <td className="px-2">{Math.round((((this.price() + Number.EPSILON) + 3)/this.props.quantity) * 1000) / 1000} per piece</td>
+                            <td className="md:w-2/5">Price for {this.props.quantity} pcs:</td>
+                            <td>{Math.round((3 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
+                          </tr>
+                          <tr>
+                            <th className="md:w-2/5">Per Piece for {this.props.quantity} pcs:</th>
+                            <td><strong>{Math.round(((3 + this.price() + Number.EPSILON)/this.props.quantity) * 1000) / 1000} per piece</strong></td>
+                          </tr>
+                          <tr>
+                            <th className="md:w-5/5" colSpan="2">Standard PCBA</th>
+                          </tr>   
+                          <tr>
+                            <td className="md:w-2/5">Loading Fee:</td>
+                            <td>$1.50 USD (Extended Part)</td>    
+                          </tr>
+                          <tr>
+                            <td className="md:w-2/5">Price for {this.props.quantity} pcs:</td>
+                            <td>{Math.round((1.5 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
+                          </tr>
+                          <tr>
+                            <td className="md:w-2/5">Per Piece for {this.props.quantity} pcs:</td>
+                            <td>{Math.round(((1.5 + this.price() + Number.EPSILON)/this.props.quantity) * 1000) / 1000} per piece</td>
                           </tr>
                       </React.Fragment>
                     : <React.Fragment>
-                        <tr>
-                            <td className="w-1 whitespace-no-wrap">Loading Fee</td>
-                            <td className="px-2">None (Basic Part)</td>    
-                        </tr>
-                        <tr>
-                            <td className="w-1 whitespace-no-wrap">Amortised Cost {this.props.quantity} pcs:</td>
-                            <td className="px-2">{Math.round((((this.price() + Number.EPSILON) + 0)/this.props.quantity) * 1000) / 1000}  per piece</td>
-                        </tr>
-                    </React.Fragment>
+                          <tr>
+                            <th className="md:w-5/5" colSpan="2">Economic PCBA</th>
+                          </tr>   
+                          <tr>
+                            <td className="md:w-2/5">Loading Fee:</td>
+                            <td>None (Basic/Preferred Part)</td>    
+                          </tr>
+                          <tr>
+                            <td className="md:w-2/5">Price for {this.props.quantity} pcs:</td>
+                            <td>{Math.round((3 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
+                          </tr>
+                          <tr>
+                            <th className="md:w-2/5">Per Piece for {this.props.quantity} pcs:</th>
+                            <td><strong>{Math.round(((0 + this.price() + Number.EPSILON)/this.props.quantity) * 1000) / 1000} per piece</strong></td>
+                          </tr>
+                          <tr>
+                            <th className="md:w-5/5" colSpan="2">Standard PCBA</th>
+                          </tr>   
+                          <tr>
+                            <td className="md:w-2/5">Loading Fee:</td>
+                            <td>$1.50 (Basic/Preferred Part)</td>    
+                          </tr>
+                          <tr>
+                            <td className="md:w-2/5">Price for {this.props.quantity} pcs:</td>
+                            <td>{Math.round((1.5 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
+                          </tr>
+                          <tr>
+                            <td className="md:w-2/5">Per Piece for {this.props.quantity} pcs:</td>
+                            <td>{Math.round(((1.5 + this.price() + Number.EPSILON)/this.props.quantity) * 1000) / 1000} per piece</td>
+                          </tr>
+                      </React.Fragment>
                 }
                   <tr>
-                    <td className="w-1 whitespace-no-wrap"></td>
-                    <td className="px-2">Prices are estimates, do not include per-joint fees.</td>    
+                    <td className="md:w-5/5" colSpan="2">Prices are estimates for Economic PCBA, do not include soldering fees.</td>    
                   </tr>
                 </tbody>
             </table>
