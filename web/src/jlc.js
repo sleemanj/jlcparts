@@ -63,8 +63,8 @@ export class AttritionInfo extends React.Component {
                 }
                 { (data.componentLibraryType === 'expand' && !data.preferredComponentFlag)
                     ? <React.Fragment>
-                          <tr>
-                            <th className="md:w-5/5" colSpan="2">Economic PCBA</th>
+                          <tr className="border-b-2 font-bold">
+                            <td className="md:w-5/5 pt-4" colSpan="2">Economic PCBA</td>
                           </tr>   
                           <tr>
                             <td className="md:w-2/5">Loading Fee:</td>
@@ -75,11 +75,11 @@ export class AttritionInfo extends React.Component {
                             <td>{Math.round((3 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
                           </tr>
                           <tr>
-                            <th className="md:w-2/5">Per Piece for {this.props.quantity} pcs:</th>
+                            <td className="md:w-2/5 font-bold">Per Piece for {this.props.quantity} pcs:</td>
                             <td><strong>{Math.round(((3 + this.price() + Number.EPSILON)/this.props.quantity) * 1000) / 1000} per piece</strong></td>
                           </tr>
-                          <tr>
-                            <th className="md:w-5/5" colSpan="2">Standard PCBA</th>
+                          <tr className="border-b-2 font-bold">
+                            <td className="md:w-5/5 pt-4" colSpan="2">Standard PCBA</td>
                           </tr>   
                           <tr>
                             <td className="md:w-2/5">Loading Fee:</td>
@@ -90,13 +90,13 @@ export class AttritionInfo extends React.Component {
                             <td>{Math.round((1.5 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
                           </tr>
                           <tr>
-                            <td className="md:w-2/5">Per Piece for {this.props.quantity} pcs:</td>
+                            <td className="md:w-2/5 font-bold">Per Piece for {this.props.quantity} pcs:</td>
                             <td>{Math.round(((1.5 + this.price() + Number.EPSILON)/this.props.quantity) * 1000) / 1000} per piece</td>
                           </tr>
                       </React.Fragment>
                     : <React.Fragment>
-                          <tr>
-                            <th className="md:w-5/5" colSpan="2">Economic PCBA</th>
+                          <tr className="border-b-2 font-bold">
+                            <td className="md:w-5/5 pt-4" colSpan="2">Economic PCBA</td>
                           </tr>   
                           <tr>
                             <td className="md:w-2/5">Loading Fee:</td>
@@ -107,11 +107,11 @@ export class AttritionInfo extends React.Component {
                             <td>{Math.round((3 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
                           </tr>
                           <tr>
-                            <th className="md:w-2/5">Per Piece for {this.props.quantity} pcs:</th>
+                            <td className="md:w-2/5 font-bold">Per Piece for {this.props.quantity} pcs:</td>
                             <td><strong>{Math.round(((0 + this.price() + Number.EPSILON)/this.props.quantity) * 1000) / 1000} per piece</strong></td>
                           </tr>
-                          <tr>
-                            <th className="md:w-5/5" colSpan="2">Standard PCBA</th>
+                          <tr className="border-b-2 font-bold">
+                            <td className="md:w-5/5 pt-4" colSpan="2">Standard PCBA</td>
                           </tr>   
                           <tr>
                             <td className="md:w-2/5">Loading Fee:</td>
@@ -122,7 +122,7 @@ export class AttritionInfo extends React.Component {
                             <td>{Math.round((1.5 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
                           </tr>
                           <tr>
-                            <td className="md:w-2/5">Per Piece for {this.props.quantity} pcs:</td>
+                            <td className="md:w-2/5 font-bold">Per Piece for {this.props.quantity} pcs:</td>
                             <td>{Math.round(((1.5 + this.price() + Number.EPSILON)/this.props.quantity) * 1000) / 1000} per piece</td>
                           </tr>
                       </React.Fragment>
