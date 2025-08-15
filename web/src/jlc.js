@@ -15,23 +15,10 @@ export class AttritionInfo extends React.Component {
     }
 
     componentDidMount() {
-        fetch("https://sparks.gogo.co.nz/jlc/search-by-part.php?partNumber="+this.props.component.lcsc, { })
+        fetch("https://sparks.gogo.co.nz/jlc/details-by-part.php?partNumber="+this.props.component.lcsc, { })
         .then(response => {
             if (!response.ok || response.status !== 200) {
                 throw new Error(`Cannot fetch ${this.props.component.lcsc}: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(({data}) => {
-            const lcscId = data.componentPageInfo.list.find(({componentCode}) => componentCode === this.props.component.lcsc)?.componentId;
-            if (lcscId === undefined) {
-                throw new Error(`No search results for ${this.props.component.lcsc}`);
-            }
-            return fetch("https://sparks.gogo.co.nz/jlc/attrition.php?componentLcscId=" + lcscId, { });
-        })
-        .then(response => {
-            if (!response.ok || response.status !== 200) {
-                throw new Error(`Cannot fetch ${this.props.lcsc}: ${response.statusText}`);
             }
             return response.json();
         })
