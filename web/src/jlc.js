@@ -1,6 +1,5 @@
 import React from "react";
 import { InlineSpinbox } from "./componentTable.js"
-import { CORS_KEY } from "./corsBridge.js";
 
 export function getQuantityPrice(quantity, pricelist) {
     return pricelist.find(pricepoint =>
