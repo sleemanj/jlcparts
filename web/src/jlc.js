@@ -87,7 +87,7 @@ export class AttritionInfo extends React.Component {
                             <td>{Math.round((1.5 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
                           </tr>
                           <tr>
-                            <td className="md:w-2/5 font-bold">Total Per Piece:</td>
+                            <td className="md:w-2/5">Total Per Piece for {this.props.quantity} pcs:</td>
                             <td>{Math.round(((1.5 + this.price() + Number.EPSILON)/this.props.quantity) * 1000) / 1000} USD</td>
                           </tr>
                       </React.Fragment>
@@ -104,7 +104,7 @@ export class AttritionInfo extends React.Component {
                             <td>{Math.round((3 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
                           </tr>
                           <tr>
-                            <td className="md:w-2/5 font-bold">Total Per Piece:</td>
+                            <td className="md:w-2/5 font-bold">Total Per Piece for {this.props.quantity} pcs:</td>
                             <td><strong>{Math.round(((0 + this.price() + Number.EPSILON)/this.props.quantity) * 1000) / 1000} USD</strong></td>
                           </tr>
                           <tr className="border-b-2 font-bold">
@@ -119,7 +119,7 @@ export class AttritionInfo extends React.Component {
                             <td>{Math.round((1.5 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
                           </tr>
                           <tr>
-                            <td className="md:w-2/5">Total Per Piece:</td>
+                            <td className="md:w-2/5">Total Per Piece for {this.props.quantity} pcs:</td>
                             <td>{Math.round(((1.5 + this.price() + Number.EPSILON)/this.props.quantity) * 1000) / 1000} USD</td>
                           </tr>
                       </React.Fragment>
