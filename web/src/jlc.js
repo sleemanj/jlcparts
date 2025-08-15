@@ -16,23 +16,7 @@ export class AttritionInfo extends React.Component {
     }
 
     componentDidMount() {
-        fetch("https://cors.bridged.cc/https://jlcpcb.com/api/overseas-pcb-order/v1/shoppingCart/smtGood/selectSmtComponentList/v2", {
-            method: 'POST',
-            headers: {
-                "Accept": 'application/json, text/plain, */*',
-                "Content-Type": 'application/json;charset=UTF-8',
-                "x-cors-grida-api-key": CORS_KEY
-            },
-            body: JSON.stringify({
-                currentPage: 1,
-                pageSize: 25,
-                keyword: this.props.component.lcsc,
-                firstSortName: "",
-                secondeSortName: "",
-                searchSource: "search",
-                componentAttributes: []
-            })
-        })
+        fetch("https://sparks.gogo.co.nz/jlc/search-by-part.php?partNumber="+this.props.component.lcsc, { })
         .then(response => {
             if (!response.ok || response.status !== 200) {
                 throw new Error(`Cannot fetch ${this.props.component.lcsc}: ${response.statusText}`);
@@ -44,11 +28,7 @@ export class AttritionInfo extends React.Component {
             if (lcscId === undefined) {
                 throw new Error(`No search results for ${this.props.component.lcsc}`);
             }
-            return fetch("https://cors.bridged.cc/https://jlcpcb.com/api/overseas-pcb-order/v1/shoppingCart/smtGood/getComponentDetail?componentLcscId=" + lcscId, {
-                headers: {
-                    "x-cors-grida-api-key": CORS_KEY
-                },
-            });
+            return fetch("https://sparks.gogo.co.nz/jlc/attrition.php?componentLcscId=" + lcscId, { });
         })
         .then(response => {
             if (!response.ok || response.status !== 200) {
