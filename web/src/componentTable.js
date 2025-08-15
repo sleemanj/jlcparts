@@ -706,7 +706,7 @@ function ExpandedComponent(props) {
             <table className="w-full border-b-2">
                 <thead className="border-b-2 font-bold">
                     <tr>
-                        <td>Quantity</td>
+                        <td className="md:w-2/5">Quantity</td>
                         <td>Unit Price</td>
                     </tr>
                 </thead>
