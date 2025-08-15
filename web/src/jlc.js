@@ -65,6 +65,29 @@ export class AttritionInfo extends React.Component {
                     <td className="w-1 whitespace-no-wrap">Price for {this.props.quantity} pcs:</td>
                     <td className="px-2">{Math.round((this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
                 </tr>
+
+                { (data.componentLibraryType === 'expand' && !data.preferredComponentFlag)
+                    ? <tr>
+                        <td className="w-1 whitespace-no-wrap">Loading Fee</td>
+                        <td className="px-2">$3 USD (Extended Part)</td>    
+                      </tr>
+                      <tr>
+                        <td className="w-1 whitespace-no-wrap">Amortised Cost {this.props.quantity} pcs:</td>
+                        <td className="px-2">{Math.round((((this.price() + Number.EPSILON) + 3)/this.props.quantity) * 1000) / 1000} per piece</td>
+                      </tr>
+                    : <tr>
+                        <td className="w-1 whitespace-no-wrap">Loading Fee</td>
+                        <td className="px-2">None (Basic Part)</td>    
+                      </tr>
+                      <tr>
+                        <td className="w-1 whitespace-no-wrap">Amortised Cost {this.props.quantity} pcs:</td>
+                        <td className="px-2">{Math.round((((this.price() + Number.EPSILON) + 0)/this.props.quantity) * 1000) / 1000}  per piece</td>
+                      </tr>
+                }
+                  <tr>
+                    <td className="w-1 whitespace-no-wrap"></td>
+                    <td className="px-2">Prices are estimates, do not include per-joint fees.</td>    
+                  </tr>
                 </tbody>
             </table>
         return <div className="w-full p-4 text-center">
