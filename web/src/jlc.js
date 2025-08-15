@@ -51,11 +51,11 @@ export class AttritionInfo extends React.Component {
                        <td className="md:w-5/5 pt-4" colSpan="2">Minimums</td>
                     </tr>   
                     <tr>
-                      <td className="md:w-2/5">Minimum Order:</td>
+                      <td className="md:w-2/5">Minimum Order Quantity:</td>
                       <td>{data.leastNumber?data.leastNumber:0} pcs</td>
                     </tr>
                     <tr>
-                      <td className="md:w-2/5">Plus Attrition:</td>
+                      <td className="md:w-2/5">Attrition:</td>
                       <td>{data.lossNumber?data.lossNumber:0} pcs</td>
                     </tr>
                 { (data.componentLibraryType === 'expand' && !data.preferredComponentFlag)
@@ -125,7 +125,10 @@ export class AttritionInfo extends React.Component {
                       </React.Fragment>
                 }
                   <tr>
-                    <td className="md:w-5/5 border-2 pt-4" colSpan="2">Prices do not include soldering fees, subject to change.</td>    
+                    <td className="md:w-5/5 border-2 pt-4" colSpan="2">
+                       <p><small>Prices do not include soldering fees, subject to change.</small></p>
+                       <p><small>Total = max( Qty+Attrition, MinimumOrderQty ) + LoadingFee</small></p>
+                    </td>    
                   </tr>
                 </tbody>
             </table>
