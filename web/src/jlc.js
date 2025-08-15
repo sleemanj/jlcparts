@@ -127,7 +127,7 @@ export class AttritionInfo extends React.Component {
                   <tr>
                     <td className="md:w-5/5 border-2 pt-4" colSpan="2">
                        <p><small>Prices do not include soldering fees, subject to change.</small></p>
-                       <p><small>Total = max( Qty+Attrition, MinimumOrderQty ) + LoadingFee</small></p>
+                       <p><small>Total = max( Qty+Attrition, MinimumOrderQty ) * UnitPrice + LoadingFee</small></p>
                     </td>    
                   </tr>
                 </tbody>
