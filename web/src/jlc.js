@@ -47,20 +47,17 @@ export class AttritionInfo extends React.Component {
         if (data)
             return <table className="w-full">
                 <tbody>
-                { data.lossNumber
-                    ? <tr>
-                        <td className="md:w-2/5">Attrition:</td>
-                        <td>{data.lossNumber} pcs</td>
-                      </tr>
-                    : ""
-                }
-                { data.leastNumber
-                    ? <tr>
-                        <td className="md:w-2/5">Minimal order quantity:</td>
-                        <td>{data.leastNumber} pcs</td>
-                      </tr>
-                    : ""
-                }
+                    <tr className="border-b-2 font-bold">
+                       <td className="md:w-5/5 pt-4" colSpan="2">Minimums</td>
+                    </tr>   
+                    <tr>
+                      <td className="md:w-2/5">Minimum Order:</td>
+                      <td>{data.leastNumber?data.leastNumber:0} pcs</td>
+                    </tr>
+                    <tr>
+                      <td className="md:w-2/5">Plus Attrition:</td>
+                      <td>{data.lossNumber?data.lossNumber:0} pcs</td>
+                    </tr>
                 { (data.componentLibraryType === 'expand' && !data.preferredComponentFlag)
                     ? <React.Fragment>
                           <tr className="border-b-2 font-bold">
@@ -128,7 +125,7 @@ export class AttritionInfo extends React.Component {
                       </React.Fragment>
                 }
                   <tr>
-                    <td className="md:w-5/5" colSpan="2">Prices are estimates for Economic PCBA, do not include soldering fees.</td>    
+                    <td className="md:w-5/5 border-2 pt-4" colSpan="2">Prices do not include soldering fees, subject to change.</td>    
                   </tr>
                 </tbody>
             </table>
