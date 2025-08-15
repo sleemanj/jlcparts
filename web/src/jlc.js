@@ -101,7 +101,7 @@ export class AttritionInfo extends React.Component {
                           </tr>
                           <tr>
                             <td className="md:w-2/5">Total Price for {this.props.quantity} pcs:</td>
-                            <td>{Math.round((3 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
+                            <td>{Math.round((0 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
                           </tr>
                           <tr>
                             <td className="md:w-2/5 font-bold">Total Per Piece for {this.props.quantity} pcs:</td>
