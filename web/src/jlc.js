@@ -1,6 +1,5 @@
 import React from "react";
 import { InlineSpinbox } from "./componentTable.js"
-import { CORS_KEY } from "./corsBridge.js";
 
 export function getQuantityPrice(quantity, pricelist) {
     return pricelist.find(pricepoint =>
@@ -16,43 +15,10 @@ export class AttritionInfo extends React.Component {
     }
 
     componentDidMount() {
-        fetch("https://cors.bridged.cc/https://jlcpcb.com/shoppingCart/smtGood/selectSmtComponentList", {
-            method: 'POST',
-            headers: {
-                "Accept": 'application/json, text/plain, */*',
-                "Content-Type": 'application/json;charset=UTF-8',
-                "x-cors-grida-api-key": CORS_KEY
-            },
-            body: JSON.stringify({
-                currentPage: 1,
-                pageSize: 25,
-                keyword: this.props.component.lcsc,
-                firstSortName: "",
-                secondeSortName: "",
-                searchSource: "search",
-                componentAttributes: []
-            })
-        })
+        fetch("https://sparks.gogo.co.nz/jlc/details-by-part.php?partNumber="+this.props.component.lcsc, { })
         .then(response => {
             if (!response.ok || response.status !== 200) {
                 throw new Error(`Cannot fetch ${this.props.component.lcsc}: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(({data}) => {
-            const lcscId = data.componentPageInfo.list.find(({componentCode}) => componentCode === this.props.component.lcsc)?.componentId;
-            if (lcscId === undefined) {
-                throw new Error(`No search results for ${this.props.component.lcsc}`);
-            }
-            return fetch("https://cors.bridged.cc/https://jlcpcb.com/shoppingCart/smtGood/getComponentDetail?componentLcscId=" + lcscId, {
-                headers: {
-                    "x-cors-grida-api-key": CORS_KEY
-                },
-            });
-        })
-        .then(response => {
-            if (!response.ok || response.status !== 200) {
-                throw new Error(`Cannot fetch ${this.props.lcsc}: ${response.statusText}`);
             }
             return response.json();
         })
@@ -81,24 +47,89 @@ export class AttritionInfo extends React.Component {
         if (data)
             return <table className="w-full">
                 <tbody>
-                { data.lossNumber
-                    ? <tr>
-                        <td className="w-1 whitespace-no-wrap">Attrition:</td>
-                        <td className="px-2">{data.lossNumber} pcs</td>
-                      </tr>
-                    : ""
+                    <tr className="border-b-2 font-bold">
+                       <td className="md:w-5/5 pt-4" colSpan="2">Minimums</td>
+                    </tr>   
+                    <tr>
+                      <td className="md:w-2/5">Minimum Order Quantity:</td>
+                      <td>{data.leastNumber?data.leastNumber:0} pcs</td>
+                    </tr>
+                    <tr>
+                      <td className="md:w-2/5">Attrition:</td>
+                      <td>{data.lossNumber?data.lossNumber:0} pcs</td>
+                    </tr>
+                { (data.componentLibraryType === 'expand' && !data.preferredComponentFlag)
+                    ? <React.Fragment>
+                          <tr className="border-b-2 font-bold">
+                            <td className="md:w-5/5 pt-4" colSpan="2">Economic PCBA</td>
+                          </tr>   
+                          <tr>
+                            <td className="md:w-2/5">Loading Fee:</td>
+                            <td>3.00 USD (Extended Part)</td>    
+                          </tr>
+                          <tr>
+                            <td className="md:w-2/5">Total Price for {this.props.quantity} pcs:</td>
+                            <td>{Math.round((3 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
+                          </tr>
+                          <tr>
+                            <td className="md:w-2/5 font-bold">Total Per Piece for {this.props.quantity} pcs:</td>
+                            <td><strong>{Math.round(((3 + this.price() + Number.EPSILON)/this.props.quantity) * 1000) / 1000} USD</strong></td>
+                          </tr>
+                          <tr className="border-b-2 font-bold">
+                            <td className="md:w-5/5 pt-4" colSpan="2">Standard PCBA</td>
+                          </tr>   
+                          <tr>
+                            <td className="md:w-2/5">Loading Fee:</td>
+                            <td>1.50 USD (Extended Part)</td>    
+                          </tr>
+                          <tr>
+                            <td className="md:w-2/5">Total Price for {this.props.quantity} pcs:</td>
+                            <td>{Math.round((1.5 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
+                          </tr>
+                          <tr>
+                            <td className="md:w-2/5">Total Per Piece for {this.props.quantity} pcs:</td>
+                            <td>{Math.round(((1.5 + this.price() + Number.EPSILON)/this.props.quantity) * 1000) / 1000} USD</td>
+                          </tr>
+                      </React.Fragment>
+                    : <React.Fragment>
+                          <tr className="border-b-2 font-bold">
+                            <td className="md:w-5/5 pt-4" colSpan="2">Economic PCBA</td>
+                          </tr>   
+                          <tr>
+                            <td className="md:w-2/5">Loading Fee:</td>
+                            <td>None (Basic/Preferred Part)</td>    
+                          </tr>
+                          <tr>
+                            <td className="md:w-2/5">Total Price for {this.props.quantity} pcs:</td>
+                            <td>{Math.round((3 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
+                          </tr>
+                          <tr>
+                            <td className="md:w-2/5 font-bold">Total Per Piece for {this.props.quantity} pcs:</td>
+                            <td><strong>{Math.round(((0 + this.price() + Number.EPSILON)/this.props.quantity) * 1000) / 1000} USD</strong></td>
+                          </tr>
+                          <tr className="border-b-2 font-bold">
+                            <td className="md:w-5/5 pt-4" colSpan="2">Standard PCBA</td>
+                          </tr>   
+                          <tr>
+                            <td className="md:w-2/5">Loading Fee:</td>
+                            <td>1.50 (Basic/Preferred Part)</td>    
+                          </tr>
+                          <tr>
+                            <td className="md:w-2/5">Total Price for {this.props.quantity} pcs:</td>
+                            <td>{Math.round((1.5 + this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
+                          </tr>
+                          <tr>
+                            <td className="md:w-2/5">Total Per Piece for {this.props.quantity} pcs:</td>
+                            <td>{Math.round(((1.5 + this.price() + Number.EPSILON)/this.props.quantity) * 1000) / 1000} USD</td>
+                          </tr>
+                      </React.Fragment>
                 }
-                { data.leastNumber
-                    ? <tr>
-                        <td className="w-1 whitespace-no-wrap">Minimal order quantity:</td>
-                        <td className="px-2">{data.leastNumber} pcs</td>
-                      </tr>
-                    : ""
-                }
-                <tr>
-                    <td className="w-1 whitespace-no-wrap">Price for {this.props.quantity} pcs:</td>
-                    <td className="px-2">{Math.round((this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
-                </tr>
+                  <tr>
+                    <td className="md:w-5/5 border-2 pt-4" colSpan="2">
+                       <p><small>Prices do not include soldering fees, subject to change.</small></p>
+                       <p><small>Total = max( Qty+Attrition, MinimumOrderQty ) * UnitPrice + LoadingFee</small></p>
+                    </td>    
+                  </tr>
                 </tbody>
             </table>
         return <div className="w-full p-4 text-center">
