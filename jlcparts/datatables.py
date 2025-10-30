@@ -27,32 +27,18 @@ class SaveDatabaseParams:
     key: str
     value: object
 
-def _save_database_item(params: SaveDatabaseParams):
-    key = params.key
-    value = params.value
-    outpath = params.outpath
-    filename = os.path.join(outpath, key + ".jsonlines.gz")
-    print(f"saving {key}")
-    with gzip.open(filename, "wt", encoding="utf-8") as f:
-        for entry in value:
-            json.dump(entry, f, separators=(',', ':'), sort_keys=False)
-            f.write("\n")
-        f.close()
-    return filename
-
-def saveDatabaseFile(database, outpath, outfilename, jobs=None):
+def saveDatabaseFile(database, outpath, outfilename):
     with tarfile.open(os.path.join(outpath, outfilename), 'w') as tar:
-        params = []
-        seenKeys = set()
         for key, value in database.items():
-            if key in seenKeys:
-                raise Exception(f"file key {key} already seen! this should never happen.")
-            seenKeys.add(key)
-            params.append(SaveDatabaseParams(key = key, value = value, outpath = outpath))
-        with multiprocessing.Pool(jobs or multiprocessing.cpu_count()) as pool:
-            for i, filename in enumerate(pool.imap_unordered(_save_database_item, params)):
-                tar.add(filename, arcname=os.path.relpath(filename, start=outpath))
-                os.unlink(filename)
+            filename = os.path.join(outpath, key + ".jsonlines.gz")
+            with gzip.open(filename, "wt", encoding="utf-8") as f:
+                for entry in value:
+                    json.dump(entry, f, separators=(',', ':'), sort_keys=False)
+                    f.write("\n")        
+            tar.add(filename, arcname=os.path.relpath(filename, start=outpath))
+            os.unlink(filename)
+
+    print("Done")
 
 def weakUpdateParameters(attrs, newParameters):
     for attr, value in newParameters.items():
@@ -504,6 +490,6 @@ def buildtables(library, outdir, ignoreoldstock, jobs):
     
     # save the database out
     print("Writing database archive...")
-    saveDatabaseFile(db, outdir, "all.jsonlines.tar", jobs)
+    saveDatabaseFile(db, outdir, "all.jsonlines.tar")
 
     print(f"Table extraction took {(t1 - t0)}, reformat into one file took {time() - t1}")
