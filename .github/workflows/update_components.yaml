@@ -3,7 +3,7 @@ on:
   push:
     branches: deploy-fixes
   schedule:
-    - cron: '0 5 * * *'
+    - cron: '0 19 */7 * *'
   workflow_dispatch:
 jobs:
   build_and_update:
